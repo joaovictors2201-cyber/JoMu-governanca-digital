@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão que Transforma Clínicas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --salmon:   #F28241;
+    --orange:   #D95D30;
+    --rust:     #BF4124;
+    --dark-red: #731F0D;
+    --black:    #0D0D0D;
+    --cream:    #FAF6F1;
+    --warm-white: #FFFCF8;
+    --light-gray: #F2EDE8;
+    --mid-gray:   #C8B8AE;
+    --text-dark:  #1A0F0A;
+    --text-body:  #3D2B22;
+    --text-muted: #8A6E63;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--warm-white);
+    color: var(--text-dark);
+    overflow-x: hidden;
+  }
+
+  /* ─── VIDEO INTRO ────────────────────────────────── */
+  #video-scroll-wrapper {
+    position: relative;
+    height: 500vh;
+  }
+  #scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .45rem;
+    opacity: 1;
+    transition: opacity .5s ease;
+    pointer-events: none;
+  }
+  #scroll-hint.hidden { opacity: 0; }
+  #scroll-hint .sh-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .72rem;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.55);
+  }
+  #scroll-hint .sh-arrow {
+    width: 20px; height: 20px;
+    border-right: 2px solid rgba(255,255,255,.55);
+    border-bottom: 2px solid rgba(255,255,255,.55);
+    transform: rotate(45deg);
+    animation: sh-bounce .9s ease-in-out infinite;
+  }
+  #scroll-hint .sh-arrow:nth-child(3) {
+    margin-top: -10px;
+    opacity: .35;
+    animation-delay: .15s;
+  }
+  @keyframes sh-bounce {
+    0%, 100% { transform: rotate(45deg) translate(0, 0); }
+    50%       { transform: rotate(45deg) translate(4px, 4px); }
+  }
+  #video-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background: #000;
+  }
+  #intro-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  #video-overlay {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  #phrase-container {
+    text-align: center;
+    padding: 0 5%;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.05s, transform 0.05s;
+  }
+  #phrase-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4.5vw, 4.2rem);
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    color: #fff;
+    line-height: 1.15;
+    text-transform: uppercase;
+    min-height: 2.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0 0.3em;
+  }
+  #phrase-text .word {
+    white-space: nowrap;
+  }
+  #phrase-text .scramble-char {
+    font-family: monospace;
+    color: var(--salmon);
+  }
+
+  /* ─── NAV ───────────────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    transition: opacity 0.4s ease, box-shadow .3s;
+    padding: 1.25rem 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,252,248,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(191,65,36,0.12);
+    transition: box-shadow .3s;
+  }
+  nav.scrolled { box-shadow: 0 2px 24px rgba(115,31,13,0.08); }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem; font-weight: 700;
+    color: var(--rust);
+    letter-spacing: -0.02em;
+  }
+  .nav-cta {
+    background: var(--rust);
+    color: white;
+    padding: .55rem 1.4rem;
+    border-radius: 2px;
+    font-size: .85rem;
+    font-weight: 500;
+    text-decoration: none;
+    letter-spacing: .03em;
+    transition: background .2s, transform .15s;
+  }
+  .nav-cta:hover { background: var(--dark-red); transform: translateY(-1px); }
+
+  /* ─── HERO ──────────────────────────────────────── */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 7rem 5% 4rem;
+    gap: 4rem;
+    background: var(--black);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg-video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    opacity: .55;
+  }
+  .hero-video-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(13,13,13,.72) 0%, rgba(13,13,13,.45) 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
+  .hero-left, .hero-right { position: relative; z-index: 2; }
+  #hero .hero-label { color: var(--salmon); }
+  #hero .hero-label::before { background: var(--salmon); }
+  #hero .hero-title { color: #fff; }
+  #hero .hero-body { color: rgba(255,255,255,.72); }
+  .hero-label {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-size: .78rem; font-weight: 500;
+    color: var(--rust); letter-spacing: .12em; text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+  .hero-label::before {
+    content: '';
+    display: inline-block; width: 28px; height: 2px;
+    background: var(--salmon);
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 5vw, 4.2rem);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--rust);
+  }
+  .hero-body {
+    font-size: 1.1rem; line-height: 1.7;
+    color: var(--text-body);
+    max-width: 480px;
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+  }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+  .btn-primary {
+    background: var(--rust);
+    color: white;
+    padding: .95rem 2.2rem;
+    border-radius: 2px;
+    font-size: 1rem; font-weight: 500;
+    text-decoration: none;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 20px rgba(191,65,36,.3);
+  }
+  .btn-primary:hover {
+    background: var(--dark-red);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(191,65,36,.35);
+  }
+  .btn-ghost {
+    color: var(--rust); font-size: .95rem; font-weight: 500;
+    text-decoration: none; display: flex; align-items: center; gap: .4rem;
+    transition: gap .2s;
+  }
+  .btn-ghost:hover { gap: .7rem; }
+  .btn-ghost::after { content: '→'; }
+
+  /* hero right: stat cards stacked */
+  .hero-right {
+    display: flex; flex-direction: column; gap: 1rem;
+    position: relative;
+  }
+  .hero-stat-card {
+    background: white;
+    border-radius: 4px;
+    padding: 1.4rem 1.75rem;
+    display: flex; align-items: center; gap: 1.25rem;
+    box-shadow: 0 2px 20px rgba(115,31,13,.07);
+    border-left: 4px solid var(--salmon);
+    opacity: 0; transform: translateX(30px);
+    transition: opacity .5s, transform .5s;
+  }
+  .hero-stat-card.visible { opacity: 1; transform: none; }
+  .hero-stat-card:nth-child(2) { border-left-color: var(--orange); margin-left: 1.5rem; }
+  .hero-stat-card:nth-child(3) { border-left-color: var(--rust); }
+  .hero-stat-card:nth-child(4) { border-left-color: var(--dark-red); margin-left: 1.5rem; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem; font-weight: 900;
+    color: var(--rust); line-height: 1;
+    min-width: 80px;
+  }
+  .stat-desc { font-size: .88rem; color: var(--text-body); line-height: 1.5; }
+  .stat-desc strong { display: block; font-size: .95rem; color: var(--text-dark); font-weight: 500; }
+
+  /* ─── SECTION BASE ──────────────────────────────── */
+  section { padding: 7rem 5%; }
+  .section-label {
+    font-size: .75rem; font-weight: 500;
+    color: var(--rust); letter-spacing: .14em; text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .section-label::before {
+    content: ''; display: inline-block;
+    width: 20px; height: 2px; background: var(--salmon);
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 900; line-height: 1.12;
+    letter-spacing: -0.025em;
+    color: var(--text-dark);
+    margin-bottom: 1.25rem;
+  }
+  .section-subtitle {
+    font-size: 1.05rem; color: var(--text-body);
+    max-width: 560px; line-height: 1.7; font-weight: 300;
+  }
+
+  /* ─── PAIN SECTION ──────────────────────────────── */
+  #pain { background: var(--cream); }
+  .pain-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5px;
+    margin-top: 4rem;
+    background: var(--mid-gray);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .pain-card {
+    background: var(--warm-white);
+    padding: 2.5rem 2rem;
+    transition: background .2s;
+  }
+  .pain-card:hover { background: white; }
+  .pain-icon {
+    display: block; margin-bottom: 1.1rem;
+    line-height: 1;
+  }
+  .pain-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 700;
+    color: var(--text-dark); margin-bottom: .65rem;
+  }
+  .pain-text { font-size: .9rem; color: var(--text-body); line-height: 1.65; }
+
+  /* ─── DATA SECTION ──────────────────────────────── */
+  #data { background: var(--black); color: white; }
+  #data .section-label { color: var(--salmon); }
+  #data .section-label::before { background: var(--salmon); }
+  #data .section-title { color: white; }
+  #data .section-subtitle { color: rgba(255,255,255,.6); }
+
+  .data-big-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 4rem;
+    background: rgba(255,255,255,.08);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .data-cell {
+    background: #0D0D0D;
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background .25s;
+  }
+  .data-cell:hover { background: #150E0A; }
+  .data-cell::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--salmon);
+    opacity: 0; transition: opacity .25s;
+  }
+  .data-cell:hover::before { opacity: 1; }
+  .data-number {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 900; line-height: 1;
+    color: var(--salmon);
+    margin-bottom: .5rem;
+  }
+  .data-label {
+    font-size: 1rem; font-weight: 500;
+    color: white; margin-bottom: .5rem;
+  }
+  .data-source {
+    font-size: .78rem; color: rgba(255,255,255,.35);
+  }
+  .data-cell.featured {
+    grid-column: span 2;
+    background: var(--rust);
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 2rem; align-items: center;
+    padding: 3.5rem 3rem;
+  }
+  .data-cell.featured:hover { background: var(--dark-red); }
+  .data-cell.featured::before { background: white; }
+  .data-cell.featured .data-number { color: white; font-size: clamp(4rem, 8vw, 7rem); }
+  .data-cell.featured .data-label { color: rgba(255,255,255,.85); font-size: 1.2rem; }
+  .data-cell.featured .data-source { color: rgba(255,255,255,.5); }
+  .featured-text { font-size: 1rem; color: rgba(255,255,255,.75); line-height: 1.7; }
+
+  /* ─── TRANSFORMATION ────────────────────────────── */
+  #transform { background: var(--warm-white); }
+  .transform-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    margin-top: 4rem;
+    align-items: start;
+  }
+  .compare-block { display: flex; flex-direction: column; gap: .75rem; }
+  .compare-title {
+    font-size: .75rem; font-weight: 500;
+    text-transform: uppercase; letter-spacing: .12em;
+    margin-bottom: .5rem;
+  }
+  .compare-title.before { color: var(--text-muted); }
+  .compare-title.after { color: var(--rust); }
+  .compare-item {
+    display: flex; align-items: flex-start; gap: .85rem;
+    padding: 1.1rem 1.25rem;
+    border-radius: 3px;
+    font-size: .92rem; line-height: 1.5;
+  }
+  .compare-item.bad {
+    background: var(--light-gray);
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--mid-gray);
+  }
+  .compare-item.good {
+    background: white;
+    color: var(--text-dark);
+    box-shadow: 0 2px 12px rgba(115,31,13,.08);
+    border-left: 3px solid var(--salmon);
+    font-weight: 500;
+  }
+  .compare-item .icon { font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+
+  /* ─── GROWTH TIMELINE ───────────────────────────── */
+  #growth { background: var(--cream); }
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 4rem;
+    background: var(--mid-gray);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .timeline-step {
+    background: var(--warm-white);
+    padding: 2.75rem 2rem;
+    position: relative;
+    transition: background .2s;
+  }
+  .timeline-step:hover { background: white; }
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem; font-weight: 900;
+    color: var(--light-gray);
+    line-height: 1; margin-bottom: 1rem;
+    transition: color .2s;
+  }
+  .timeline-step:hover .step-num { color: rgba(217,93,48,.15); }
+  .step-period {
+    display: inline-block;
+    font-size: .72rem; font-weight: 500;
+    text-transform: uppercase; letter-spacing: .1em;
+    color: var(--rust); background: rgba(242,130,65,.12);
+    padding: .2rem .65rem; border-radius: 2px;
+    margin-bottom: .9rem;
+  }
+  .step-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; font-weight: 700;
+    color: var(--text-dark); margin-bottom: .75rem;
+  }
+  .step-text { font-size: .88rem; color: var(--text-body); line-height: 1.7; }
+
+  /* ─── PATIENTS SECTION ──────────────────────────── */
+  #patients { background: var(--warm-white); }
+  .patients-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 6rem;
+    margin-top: 4rem;
+    align-items: center;
+  }
+  .big-stat-block {
+    text-align: center; padding: 3.5rem 2rem;
+    background: var(--rust);
+    border-radius: 4px;
+    color: white;
+  }
+  .big-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 7rem; font-weight: 900; line-height: 1;
+    color: white;
+  }
+  .big-stat-label {
+    font-size: 1rem; opacity: .8; line-height: 1.6;
+    margin-top: .5rem;
+  }
+  .patient-stats { display: flex; flex-direction: column; gap: 1.25rem; }
+  .patient-stat-row {
+    display: flex; gap: 1.5rem; align-items: flex-start;
+    padding: 1.5rem;
+    background: var(--cream);
+    border-radius: 3px;
+    transition: background .2s, box-shadow .2s;
+  }
+  .patient-stat-row:hover {
+    background: white;
+    box-shadow: 0 4px 20px rgba(115,31,13,.08);
+  }
+  .psn {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 900;
+    color: var(--rust); min-width: 70px; line-height: 1;
+  }
+  .pst .label { font-size: .95rem; font-weight: 500; color: var(--text-dark); margin-bottom: .25rem; }
+  .pst .desc { font-size: .85rem; color: var(--text-body); line-height: 1.5; }
+
+  /* ─── SITE / SEO SECTION ────────────────────────── */
+  #site { background: var(--black); color: white; }
+  #site .section-label { color: var(--salmon); }
+  #site .section-label::before { background: var(--salmon); }
+  #site .section-title { color: white; }
+  #site .section-subtitle { color: rgba(255,255,255,.6); max-width: 640px; }
+
+  .site-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+  .site-card {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 4px;
+    padding: 2rem 2rem 2rem 2.25rem;
+    position: relative;
+    transition: background .2s, border-color .2s;
+  }
+  .site-card:hover {
+    background: rgba(242,130,65,.07);
+    border-color: rgba(242,130,65,.2);
+  }
+  .site-card-icon {
+    display: block; margin-bottom: 1rem; line-height: 1;
+  }
+  .site-card-title {
+    font-size: 1rem; font-weight: 500;
+    color: white; margin-bottom: .5rem;
+  }
+  .site-card-text { font-size: .88rem; color: rgba(255,255,255,.55); line-height: 1.65; }
+  .site-card.wide {
+    grid-column: span 2;
+    background: rgba(191,65,36,.15);
+    border-color: rgba(191,65,36,.3);
+    display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: center;
+  }
+  .site-card.wide:hover { background: rgba(191,65,36,.22); }
+  .wide-badge {
+    background: var(--rust);
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: 3px;
+    text-align: center; white-space: nowrap;
+  }
+  .wide-badge .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; font-weight: 900; display: block;
+  }
+  .wide-badge .sub { font-size: .78rem; opacity: .85; }
+
+  /* ─── DIAGNOSE CTA ──────────────────────────────── */
+  #cta {
+    background: var(--cream);
+    text-align: center;
+    padding: 9rem 5%;
+    position: relative;
+    overflow: hidden;
+  }
+  #cta::before {
+    content: '';
+    position: absolute; top: -40%; left: 50%; transform: translateX(-50%);
+    width: 80vw; height: 80vw; max-width: 700px;
+    background: radial-gradient(circle, rgba(217,93,48,.08) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .cta-label { justify-content: center; }
+  .cta-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900; line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--text-dark);
+    max-width: 720px; margin: 0 auto 1.5rem;
+  }
+  .cta-title em { font-style: italic; color: var(--rust); }
+  .cta-body {
+    font-size: 1.1rem; color: var(--text-body); line-height: 1.7;
+    max-width: 500px; margin: 0 auto 3rem; font-weight: 300;
+  }
+  .cta-form {
+    display: flex; gap: .75rem; justify-content: center;
+    flex-wrap: wrap; max-width: 520px; margin: 0 auto 1.5rem;
+  }
+  .cta-input {
+    flex: 1; min-width: 200px;
+    padding: .9rem 1.2rem;
+    border: 1.5px solid var(--mid-gray);
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem; color: var(--text-dark);
+    background: white;
+    transition: border-color .2s;
+    outline: none;
+  }
+  .cta-input:focus { border-color: var(--rust); }
+  .cta-input::placeholder { color: var(--text-muted); }
+  .btn-cta {
+    background: var(--rust);
+    color: white; border: none;
+    padding: .9rem 2rem;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem; font-weight: 500;
+    cursor: pointer;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 20px rgba(191,65,36,.3);
+    white-space: nowrap;
+  }
+  .btn-cta:hover {
+    background: var(--dark-red);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(191,65,36,.35);
+  }
+  .cta-disclaimer { font-size: .8rem; color: var(--text-muted); }
+
+  /* ─── DIAGNOSE CHECKLIST ────────────────────────── */
+  #checklist { background: var(--warm-white); }
+  .checklist-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    margin-top: 4rem;
+    align-items: start;
+  }
+  .checklist-items { display: flex; flex-direction: column; gap: .6rem; }
+  .check-item {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: 1.1rem 1.25rem;
+    border-radius: 3px;
+    font-size: .92rem; color: var(--text-body); line-height: 1.5;
+    background: var(--cream);
+    cursor: pointer; transition: background .2s, box-shadow .2s;
+    user-select: none;
+  }
+  .check-item:hover { background: white; box-shadow: 0 2px 12px rgba(115,31,13,.07); }
+  .check-item.checked {
+    background: white;
+    color: var(--text-dark);
+    font-weight: 500;
+    box-shadow: 0 2px 16px rgba(115,31,13,.1);
+  }
+  .check-box {
+    width: 18px; height: 18px; flex-shrink: 0;
+    border: 2px solid var(--mid-gray);
+    border-radius: 2px; margin-top: .05rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .2s, background .2s;
+    font-size: .7rem; color: white;
+  }
+  .check-item.checked .check-box {
+    background: var(--rust);
+    border-color: var(--rust);
+  }
+  .checklist-result {
+    position: sticky; top: 7rem;
+    background: var(--rust);
+    border-radius: 4px;
+    padding: 3rem 2.5rem;
+    color: white;
+  }
+  .result-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem; font-weight: 900; line-height: 1;
+    color: white; margin-bottom: .25rem;
+  }
+  .result-label { font-size: .8rem; opacity: .7; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 1.5rem; }
+  .result-message {
+    font-size: 1rem; line-height: 1.7;
+    color: rgba(255,255,255,.85);
+    margin-bottom: 2rem;
+  }
+  .result-bar-wrap {
+    background: rgba(255,255,255,.15);
+    border-radius: 2px; height: 6px; margin-bottom: 2rem;
+  }
+  .result-bar {
+    height: 6px; border-radius: 2px;
+    background: white;
+    width: 0%; transition: width .6s ease;
+  }
+  .btn-result {
+    display: block; width: 100%;
+    background: white; color: var(--rust);
+    padding: .9rem; border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem; font-weight: 500;
+    text-align: center; text-decoration: none;
+    border: none; cursor: pointer;
+    transition: opacity .2s, transform .15s;
+    box-shadow: 0 4px 20px rgba(0,0,0,.15);
+  }
+  .btn-result:hover { opacity: .9; transform: translateY(-1px); }
+
+  /* ─── PHOTO PLACEHOLDERS ────────────────────────── */
+  .photo-placeholder {
+    background: var(--light-gray);
+    border: 2px dashed var(--mid-gray);
+    border-radius: 4px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: .5rem; color: var(--text-muted);
+    font-size: .85rem; text-align: center;
+    padding: 2rem;
+    min-height: 240px;
+  }
+  .photo-placeholder .icon { font-size: 2rem; opacity: .4; }
+  .photo-placeholder .hint { font-size: .75rem; opacity: .6; max-width: 180px; }
+
+  /* ─── FOOTER ────────────────────────────────────── */
+  footer {
+    background: var(--black);
+    color: rgba(255,255,255,.4);
+    text-align: center;
+    padding: 2.5rem 5%;
+    font-size: .82rem;
+  }
+  footer span { color: var(--salmon); }
+
+  /* ─── SCROLL ANIMATIONS ─────────────────────────── */
+  .reveal {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity .65s ease, transform .65s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ─── RESPONSIVE ────────────────────────────────── */
+  @media (max-width: 900px) {
+    #hero { grid-template-columns: 1fr; padding: 6rem 5% 3rem; gap: 3rem; }
+    .hero-right { display: none; }
+    .pain-grid, .timeline, .data-big-grid,
+    .transform-layout, .patients-layout,
+    .site-grid, .checklist-layout { grid-template-columns: 1fr; }
+    .data-cell.featured, .site-card.wide { grid-column: span 1; grid-template-columns: 1fr; }
+    .transform-layout, .patients-layout { gap: 2.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- VIDEO INTRO SCROLL WRAPPER -->
+<div id="video-scroll-wrapper">
+  <div id="video-sticky">
+    <video id="intro-video" src="video topo landing page.mp4" muted playsinline preload="auto"></video>
+    <div id="scroll-hint">
+      <span class="sh-label">Scroll</span>
+      <div class="sh-arrow"></div>
+      <div class="sh-arrow"></div>
+    </div>
+    <div id="video-overlay">
+      <div id="phrase-container">
+        <div id="phrase-text"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT (nav + all sections) -->
+<div id="main-content">
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">Respo</div>
+  <a href="#cta" class="nav-cta">Falar com a JoMu</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <video class="hero-bg-video" src="7089942-uhd_3840_2160_25fps.mp4" autoplay muted loop playsinline></video>
+  <div class="hero-video-overlay"></div>
+  <div class="hero-left">
+    <div class="hero-label">Para gestores de clínicas médicas</div>
+    <h1 class="hero-title">
+      Sua clínica perde dinheiro<br>
+      <em>todos os dias</em><br>
+      sem perceber.
+    </h1>
+    <p class="hero-body">
+      Faltas não gerenciadas, pacientes que somem, financeiro que não fecha. 
+      Não é falta de esforço — é falta da estrutura certa.
+    </p>
+    <div class="hero-actions">
+      <a href="#cta" class="btn-primary">Quero transformar minha clínica</a>
+      <a href="#pain" class="btn-ghost">Ver os dados</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-stat-card">
+      <div class="stat-num">68%</div>
+      <div class="stat-desc">
+        <strong>Clínicas fecham em 5 anos</strong>
+        sem estrutura de gestão — CFM 2023
+      </div>
+    </div>
+    <div class="hero-stat-card">
+      <div class="stat-num">2,8h</div>
+      <div class="stat-desc">
+        <strong>Perdidas por dia</strong>
+        em tarefas administrativas que poderiam ser automatizadas
+      </div>
+    </div>
+    <div class="hero-stat-card">
+      <div class="stat-num">R$14k</div>
+      <div class="stat-desc">
+        <strong>Prejuízo médio mensal</strong>
+        só em faltas não gerenciadas — IBRAMERC 2024
+      </div>
+    </div>
+    <div class="hero-stat-card">
+      <div class="stat-num">41%</div>
+      <div class="stat-desc">
+        <strong>Pacientes não retornam</strong>
+        sem nenhum follow-up estruturado — Doctoralia 2023
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN SECTION -->
+<section id="pain">
+  <div class="reveal">
+    <div class="section-label">O problema é real</div>
+    <h2 class="section-title">Você reconhece alguma<br>dessas situações?</h2>
+    <p class="section-subtitle">
+      São dores comuns em clínicas de 3 a 10 anos. Invisíveis no dia a dia, 
+      mas com impacto direto no faturamento e na qualidade do atendimento.
+    </p>
+  </div>
+  <div class="pain-grid reveal" style="transition-delay:.15s">
+    <div class="pain-card">
+      <span class="pain-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#BF4124" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="12" cy="16" r="1" fill="#BF4124"/><line x1="8" y1="14" x2="8" y2="18"/><line x1="16" y1="14" x2="16" y2="18"/></svg>
+      </span>
+      <div class="pain-title">Agenda com buracos</div>
+      <p class="pain-text">Horários vagos que poderiam estar preenchidos. Confirmações feitas manualmente, uma a uma, pelo WhatsApp.</p>
+    </div>
+    <div class="pain-card">
+      <span class="pain-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#BF4124" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/><line x1="9" y1="3" x2="15" y2="3"/></svg>
+      </span>
+      <div class="pain-title">Financeiro que não fecha</div>
+      <p class="pain-text">O mês termina e os números não batem. Faturamento imprevisível, custos difíceis de rastrear.</p>
+    </div>
+    <div class="pain-card">
+      <span class="pain-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#BF4124" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><line x1="18" y1="14" x2="23" y2="19"/><line x1="23" y1="14" x2="18" y2="19"/></svg>
+      </span>
+      <div class="pain-title">Pacientes que somem</div>
+      <p class="pain-text">Ninguém sabe quantos pacientes novos vs. retorno. Pacientes vêm uma vez e não voltam.</p>
+    </div>
+    <div class="pain-card">
+      <span class="pain-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#BF4124" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-4 4-2-2"/></svg>
+      </span>
+      <div class="pain-title">Equipe sobrecarregada</div>
+      <p class="pain-text">Mais tempo ligando e confirmando do que atendendo. Retrabalho que consome energia do time todo.</p>
+    </div>
+    <div class="pain-card">
+      <span class="pain-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#BF4124" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+      </span>
+      <div class="pain-title">Sem visão do negócio</div>
+      <p class="pain-text">Decisões no instinto, sem dados. Não sabe o que cresce, o que trava, o que precisa mudar.</p>
+    </div>
+    <div class="pain-card">
+      <span class="pain-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#BF4124" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/><line x1="12" y1="9" x2="12" y2="9.01"/><line x1="17" y1="3" x2="21" y2="3"/><line x1="21" y1="3" x2="21" y2="7"/></svg>
+      </span>
+      <div class="pain-title">Expansão parece impossível</div>
+      <p class="pain-text">Você mal gerencia a unidade atual. Abrir outra parece um pesadelo, não uma oportunidade.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DATA SECTION -->
+<section id="data">
+  <div class="reveal">
+    <div class="section-label">Os números não mentem</div>
+    <h2 class="section-title">Quanto custa, na prática,<br>não ter gestão?</h2>
+    <p class="section-subtitle">
+      Dados do setor de saúde brasileiro mostram o impacto financeiro real 
+      da gestão ineficiente em clínicas de pequeno porte.
+    </p>
+  </div>
+  <div class="data-big-grid reveal" style="transition-delay:.1s">
+    <div class="data-cell featured">
+      <div>
+        <div class="data-number">R$36k</div>
+        <div class="data-label">Em receita perdida por mês</div>
+        <div class="data-source">Estimativa para clínica com 8 médicos sem gestão estruturada</div>
+      </div>
+      <p class="featured-text">
+        São aproximadamente 120 faltas não gerenciadas, 200 pacientes por ano que não retornam 
+        e 22 horas semanais da equipe em retrabalho operacional. 
+        Tudo isso somado, todo mês, sem que ninguém perceba.
+      </p>
+    </div>
+    <div class="data-cell">
+      <div class="data-number">78%</div>
+      <div class="data-label">Do faturamento desperdiçado em faltas</div>
+      <div class="data-source">FGV Saúde 2023</div>
+    </div>
+    <div class="data-cell">
+      <div class="data-number">90%</div>
+      <div class="data-label">De perda com pacientes não retornados</div>
+      <div class="data-source">IBRAMERC 2024</div>
+    </div>
+    <div class="data-cell">
+      <div class="data-number">55%</div>
+      <div class="data-label">Em retrabalho administrativo evitável</div>
+      <div class="data-source">FGV Saúde 2023</div>
+    </div>
+    <div class="data-cell">
+      <div class="data-number">40%</div>
+      <div class="data-label">Em erros de faturamento corrigíveis</div>
+      <div class="data-source">CFM 2023</div>
+    </div>
+  </div>
+</section>
+
+<!-- TRANSFORMATION -->
+<section id="transform">
+  <div class="reveal">
+    <div class="section-label">A virada</div>
+    <h2 class="section-title">O que muda quando a gestão<br>é profissionalizada</h2>
+    <p class="section-subtitle">
+      Não é uma promessa abstrata. São resultados observados em clínicas 
+      que estruturaram seus processos — McKinsey Health 2023, SEBRAE Saúde 2024.
+    </p>
+  </div>
+  <div class="transform-layout reveal" style="transition-delay:.1s">
+    <div class="compare-block">
+      <div class="compare-title before">Hoje, sem gestão estruturada</div>
+      <div class="compare-item bad"><span class="icon">✕</span> Agenda com buracos e faltas sem controle</div>
+      <div class="compare-item bad"><span class="icon">✕</span> Financeiro no Excel ou caderno</div>
+      <div class="compare-item bad"><span class="icon">✕</span> Paciente sumiu? Ninguém sabe</div>
+      <div class="compare-item bad"><span class="icon">✕</span> Equipe sobrecarregada de ligações</div>
+      <div class="compare-item bad"><span class="icon">✕</span> Faturamento imprevisível</div>
+      <div class="compare-item bad"><span class="icon">✕</span> Expansão parece um sonho distante</div>
+    </div>
+    <div class="compare-block">
+      <div class="compare-title after">Com gestão integrada</div>
+      <div class="compare-item good"><span class="icon">✓</span> +28% na taxa de ocupação real da agenda</div>
+      <div class="compare-item good"><span class="icon">✓</span> Financeiro em tempo real, sem erro</div>
+      <div class="compare-item good"><span class="icon">✓</span> Reativação automática de pacientes inativos</div>
+      <div class="compare-item good"><span class="icon">✓</span> Equipe focada no que realmente importa</div>
+      <div class="compare-item good"><span class="icon">✓</span> Crescimento previsível, mês a mês</div>
+      <div class="compare-item good"><span class="icon">✓</span> Segunda unidade: possível e planejável</div>
+    </div>
+  </div>
+</section>
+
+<!-- GROWTH TIMELINE -->
+<section id="growth">
+  <div class="reveal">
+    <div class="section-label">O caminho para expansão</div>
+    <h2 class="section-title">Gestão eficiente abre a porta<br>para crescer de verdade</h2>
+    <p class="section-subtitle">
+      Clínicas que estruturaram a gestão seguiram um caminho parecido. 
+      Três etapas, com resultados concretos em cada uma. Fonte: SEBRAE 2024.
+    </p>
+  </div>
+  <div class="timeline reveal" style="transition-delay:.1s">
+    <div class="timeline-step">
+      <div class="step-num">01</div>
+      <div class="step-period">Mês 1–3</div>
+      <div class="step-title">Estabilização</div>
+      <p class="step-text">
+        Processos organizados, time alinhado, agenda sem buracos. 
+        Financeiro que fecha. Previsibilidade estabelecida pela primeira vez.
+      </p>
+    </div>
+    <div class="timeline-step">
+      <div class="step-num">02</div>
+      <div class="step-period">Mês 4–8</div>
+      <div class="step-title">Otimização</div>
+      <p class="step-text">
+        Aumento de ticket médio, redução de custos operacionais, 
+        retenção de pacientes acima de 70%. A clínica começa a gerar mais com menos esforço.
+      </p>
+    </div>
+    <div class="timeline-step">
+      <div class="step-num">03</div>
+      <div class="step-period">Mês 9–18</div>
+      <div class="step-title">Escala</div>
+      <p class="step-text">
+        Nova unidade viável, expansão de especialidades, marca reconhecida na região. 
+        O que parecia impossível se torna o próximo passo natural.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- PATIENTS + FIDELIZATION -->
+<section id="patients">
+  <div class="reveal">
+    <div class="section-label">O valor do paciente fiel</div>
+    <h2 class="section-title">Fidelizar vale até 5× mais<br>do que captar um novo</h2>
+    <p class="section-subtitle">
+      Você já tem os pacientes mais valiosos — os que já vieram. 
+      A pergunta é: o que você está fazendo para que eles voltem?
+    </p>
+  </div>
+  <div class="patients-layout reveal" style="transition-delay:.1s">
+    <div>
+      <div class="big-stat-block">
+        <div class="big-stat-num">5×</div>
+        <div class="big-stat-label">o LTV de um paciente fidelizado vs.<br>custo de aquisição de um novo paciente</div>
+      </div>
+      <div style="margin-top:1rem; border-radius:4px; overflow:hidden; line-height:0;">
+        <img
+          src="pexels-rdne-7580635.jpg"
+          alt="Médico com paciente"
+          style="width:100%; display:block; border-radius:4px;"
+        >
+      </div>
+    </div>
+    <div class="patient-stats">
+      <div class="patient-stat-row">
+        <div class="psn">72%</div>
+        <div class="pst">
+          <div class="label">Taxa de retorno com lembretes automáticos</div>
+          <div class="desc">Pacientes que recebem comunicação estruturada retornam dentro de 12 meses — Doctoralia Research 2023</div>
+        </div>
+      </div>
+      <div class="patient-stat-row">
+        <div class="psn">+35%</div>
+        <div class="pst">
+          <div class="label">Crescimento de receita com follow-up</div>
+          <div class="desc">Clínicas com programa de acompanhamento estruturado crescem 35% mais que a média do setor — IBRAMERC 2024</div>
+        </div>
+      </div>
+      <div class="patient-stat-row">
+        <div class="psn">R$0</div>
+        <div class="pst">
+          <div class="label">Custo de reativar um paciente inativo</div>
+          <div class="desc">Comparado a R$80–200 para captar um paciente novo. Seu melhor lead já está na sua base — Harvard Business Review</div>
+        </div>
+      </div>
+      <div class="patient-stat-row">
+        <div class="psn">200</div>
+        <div class="pst">
+          <div class="label">Pacientes perdidos por ano sem follow-up</div>
+          <div class="desc">Em uma clínica com 8 médicos, sem sistema de reativação. Cada um representa receita que foi embora silenciosamente.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SITE / SEO SECTION -->
+<section id="site">
+  <div class="reveal">
+    <div class="section-label">Presença digital que converte</div>
+    <h2 class="section-title">Seu site é um vendedor<br>trabalhando 24h — ou não?</h2>
+    <p class="section-subtitle">
+      Um site bem construído não é apenas cartão de visita. É o fator que decide 
+      se um paciente vai ligar para você ou para o concorrente. E o Google sabe a diferença.
+    </p>
+  </div>
+  <div class="site-grid reveal" style="transition-delay:.1s">
+    <div class="site-card wide">
+      <div class="wide-badge">
+        <span class="num">↑ Top 3</span>
+        <span class="sub">no Google Maps</span>
+      </div>
+      <div>
+        <div class="site-card-title" style="font-size:1.1rem; color:white; margin-bottom:.6rem">
+          Google pontua clínicas com site estruturado, rápido e com agendamento online
+        </div>
+        <p class="site-card-text" style="font-size:.95rem">
+          Clínicas com site otimizado aparecem até 3 posições acima no Google Maps. 
+          Considerando que 76% dos pacientes escolhem o prestador pelo resultado da primeira página, 
+          estar no topo não é vantagem — é necessidade. Fonte: Google Health 2024.
+        </p>
+      </div>
+    </div>
+    <div class="site-card">
+      <span class="site-card-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </span>
+      <div class="site-card-title">Velocidade acima de tudo</div>
+      <p class="site-card-text">Sites que carregam em menos de 3 segundos convertem 3× mais. O Google penaliza diretamente páginas lentas no ranqueamento.</p>
+    </div>
+    <div class="site-card">
+      <span class="site-card-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </span>
+      <div class="site-card-title">SEO local estruturado</div>
+      <p class="site-card-text">Nome, endereço e especialidades no formato certo. Palavras-chave por bairro. Schema markup médico. O que o Google precisa para te mostrar primeiro.</p>
+    </div>
+    <div class="site-card">
+      <span class="site-card-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><polyline points="12 16 14 18 18 14"/></svg>
+      </span>
+      <div class="site-card-title">Agendamento online integrado</div>
+      <p class="site-card-text">Botão de agendamento visível em todas as páginas. Pacientes que encontram facilidade para marcar, marcam. Simples assim.</p>
+    </div>
+    <div class="site-card">
+      <span class="site-card-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </span>
+      <div class="site-card-title">Gestão de avaliações</div>
+      <p class="site-card-text">Automatizar pedidos de avaliação pós-consulta aumenta a nota no Google e gera prova social. Mais estrelas = mais visibilidade = mais pacientes.</p>
+    </div>
+    <div class="site-card">
+      <span class="site-card-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      </span>
+      <div class="site-card-title">Mobile-first sempre</div>
+      <p class="site-card-text">87% das buscas por clínicas acontecem pelo celular. Um site que não funciona bem no mobile perde quase todos os pacientes antes mesmo do contato.</p>
+    </div>
+    <div class="site-card">
+      <span class="site-card-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      </span>
+      <div class="site-card-title">Integração com gestão interna</div>
+      <p class="site-card-text">Site conectado ao sistema da clínica: agenda em tempo real, confirmação automática, prontuário. O paciente agenda e já entra no fluxo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CHECKLIST INTERATIVO -->
+<section id="checklist">
+  <div class="reveal">
+    <div class="section-label">Autodiagnóstico</div>
+    <h2 class="section-title">Marque o que é<br>verdade na sua clínica</h2>
+    <p class="section-subtitle">
+      Cada item marcado representa uma oportunidade de receita que ainda não está sendo capturada.
+    </p>
+  </div>
+  <div class="checklist-layout reveal" style="transition-delay:.1s">
+    <div class="checklist-items" id="checklistItems">
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box">✓</div>
+        <span>A agenda tem horários vagos frequentes que poderiam estar preenchidos</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box">✓</div>
+        <span>A equipe passa mais tempo confirmando consultas do que atendendo</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box">✓</div>
+        <span>O financeiro do mês não fecha com clareza</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box">✓</div>
+        <span>Não sei quantos pacientes novos vs. retorno atendo por mês</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box">✓</div>
+        <span>Perdi pacientes por falta de acompanhamento pós-consulta</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box">✓</div>
+        <span>Expandir parece impossível — mal consigo gerenciar a unidade atual</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box">✓</div>
+        <span>Meu site não aparece nos primeiros resultados do Google da minha cidade</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box">✓</div>
+        <span>Não tenho agendamento online disponível 24h</span>
+      </div>
+    </div>
+    <div class="checklist-result" id="checklistResult">
+      <div class="result-score" id="scoreNum">0</div>
+      <div class="result-label">pontos identificados</div>
+      <div class="result-bar-wrap"><div class="result-bar" id="resultBar"></div></div>
+      <p class="result-message" id="resultMsg">
+        Marque os itens ao lado para ver o diagnóstico da sua clínica.
+      </p>
+      <a href="maturidade_clinica.html" class="btn-result" id="resultBtn">Quero o diagnóstico completo →</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section id="cta">
+  <div class="section-label cta-label reveal">Comece agora</div>
+  <h2 class="cta-title reveal" style="transition-delay:.1s">
+    Sua clínica tem potencial.<br>
+    <em>A JoMu faz o resto.</em>
+  </h2>
+  <p class="cta-body reveal" style="transition-delay:.2s">
+    Gestão integrada de agenda, pacientes, financeiro e presença digital — 
+    tudo em um só lugar, pensado para clínicas médicas de verdade.
+  </p>
+  <div class="cta-form reveal" style="transition-delay:.3s">
+    <input type="text" class="cta-input" placeholder="Nome da clínica">
+    <input type="tel" class="cta-input" placeholder="WhatsApp">
+    <button class="btn-cta" onclick="submitCTA()">Quero começar</button>
+  </div>
+  <p class="cta-disclaimer reveal" style="transition-delay:.4s">
+    Ou prefere começar pelo diagnóstico?
+    <a href="maturidade_clinica.html" style="color:var(--rust); font-weight:500; text-decoration:none; margin-left:.3rem">Avaliar maturidade da clínica →</a>
+  </p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Dados: CFM 2023 · IBRAMERC 2024 · SEBRAE Saúde 2024 · FGV Saúde 2023 · McKinsey Health 2023 · Harvard Business Review · Google Health 2024</p>
+  <p style="margin-top:.5rem">© 2024 <span>Respo</span> · Plataforma de gestão para clínicas médicas</p>
+</footer>
+
+</div><!-- /#main-content -->
+
+<script>
+  // ── Nav scroll ──────────────────────────────────
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // ── Reveal on scroll ────────────────────────────
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+
+  // ── Hero stat cards stagger ──────────────────────
+  document.querySelectorAll('.hero-stat-card').forEach((c, i) => {
+    setTimeout(() => c.classList.add('visible'), 500 + i * 150);
+  });
+
+  // ── Checklist ───────────────────────────────────
+  const msgs = [
+    "Sua clínica está em boa forma. Mas sempre há espaço para otimizar.",
+    "Há oportunidades claras. Vale a pena investigar o que está travando.",
+    "Sua clínica está perdendo receita todo mês. Vamos conversar.",
+    "Situação crítica. Cada dia sem estrutura custa caro. Fale conosco hoje.",
+    "Potencial enorme sendo desperdiçado. Um diagnóstico pode mudar o jogo."
+  ];
+
+  function toggleCheck(el) {
+    el.classList.toggle('checked');
+    updateScore();
+  }
+
+  function updateScore() {
+    const total = document.querySelectorAll('.check-item.checked').length;
+    const max = 8;
+    document.getElementById('scoreNum').textContent = total;
+    document.getElementById('resultBar').style.width = (total / max * 100) + '%';
+    const idx = total === 0 ? 0 : total <= 2 ? 1 : total <= 4 ? 2 : total <= 6 ? 3 : 4;
+    document.getElementById('resultMsg').textContent = msgs[idx];
+  }
+
+  // ── CTA submit ──────────────────────────────────
+  function submitCTA() {
+    const btn = document.querySelector('.btn-cta');
+    btn.textContent = '✓ Recebemos! Em breve entraremos em contato.';
+    btn.style.background = 'var(--dark-red)';
+    btn.disabled = true;
+  }
+
+  // ── Scroll-driven video intro ────────────────────
+  (function () {
+    const wrapper   = document.getElementById('video-scroll-wrapper');
+    const video     = document.getElementById('intro-video');
+    const overlay   = document.getElementById('video-overlay');
+    const phraseBox = document.getElementById('phrase-container');
+    const phraseEl  = document.getElementById('phrase-text');
+    const mainContent = document.getElementById('main-content');
+
+    const PHRASE1 = 'DADOS DISPERSOS SÃO APENAS RUÍDO';
+    const PHRASE2 = 'GESTÃO É A SOLUÇÃO QUE CONECTA';
+    const SCRAMBLE_POOL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*';
+    const SPECIAL = /[^A-Za-z0-9 ]/;
+
+    // Phase breakpoints (scroll progress 0→1)
+    const P_VIDEO_END      = 0.60;
+    const P_FADE_END       = 0.67;
+    const P_PHRASE1_END    = 0.73;
+    const P_PHRASE1_HOLD   = 0.86;  // phrase 1 stays visible until here
+    const P_SCRAMBLE_END   = 0.94;
+
+    let lastProgress = -1;
+    let videoReady = false;
+
+    function rand(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function renderPhrase(source, target, scrambleProgress) {
+      const targetWords = target.split(' ');
+      const totalChars = target.replace(/ /g, '').length;
+      let globalIdx = 0;
+      const wordSpans = targetWords.map(word => {
+        const chars = word.split('').map(ch => {
+          const resolved = globalIdx / totalChars < scrambleProgress;
+          globalIdx++;
+          if (resolved || SPECIAL.test(ch)) return ch;
+          return `<span class="scramble-char">${rand(SCRAMBLE_POOL)}</span>`;
+        }).join('');
+        return `<span class="word">${chars}</span>`;
+      });
+      phraseEl.innerHTML = wordSpans.join(' ');
+    }
+
+    function setPhrase(text) {
+      phraseEl.innerHTML = text.split(' ')
+        .map(w => `<span class="word">${w}</span>`)
+        .join(' ');
+    }
+
+    function onScroll() {
+      const wrapperH = wrapper.offsetHeight;
+      const scrollable = wrapperH - window.innerHeight;
+      const scrolled = Math.min(Math.max(window.scrollY, 0), scrollable);
+      const progress = scrolled / scrollable;
+
+      if (Math.abs(progress - lastProgress) < 0.0005) return;
+      lastProgress = progress;
+
+      // ── Nav visibility ──────────────────────────
+      const wrapperBottom = wrapper.getBoundingClientRect().bottom;
+      if (wrapperBottom > 0) {
+        nav.style.opacity = '0';
+        nav.style.pointerEvents = 'none';
+      } else {
+        nav.style.opacity = '1';
+        nav.style.pointerEvents = '';
+      }
+
+      // ── Phase 1: video scrub (0 → P_VIDEO_END) ──
+      if (progress <= P_VIDEO_END) {
+        if (videoReady) {
+          video.currentTime = (progress / P_VIDEO_END) * video.duration;
+        }
+        overlay.style.opacity = '0';
+        phraseBox.style.opacity = '0';
+        phraseBox.style.transform = 'translateY(12px)';
+        return;
+      }
+
+      // Ensure video is at last frame
+      if (videoReady) video.currentTime = video.duration;
+
+      // ── Phase 2: fade to black (P_VIDEO_END → P_FADE_END) ──
+      if (progress <= P_FADE_END) {
+        const p = (progress - P_VIDEO_END) / (P_FADE_END - P_VIDEO_END);
+        overlay.style.opacity = String(p);
+        phraseBox.style.opacity = '0';
+        phraseBox.style.transform = 'translateY(12px)';
+        return;
+      }
+
+      overlay.style.opacity = '1';
+
+      // ── Phase 3: phrase 1 fade in (P_FADE_END → P_PHRASE1_END) ──
+      if (progress <= P_PHRASE1_END) {
+        const p = (progress - P_FADE_END) / (P_PHRASE1_END - P_FADE_END);
+        phraseBox.style.opacity = String(p);
+        phraseBox.style.transform = `translateY(${12 - 12 * p}px)`;
+        setPhrase(PHRASE1);
+        return;
+      }
+
+      phraseBox.style.opacity = '1';
+      phraseBox.style.transform = 'translateY(0)';
+
+      // ── Phase 4: phrase 1 hold (P_PHRASE1_END → P_PHRASE1_HOLD) ──
+      if (progress <= P_PHRASE1_HOLD) {
+        setPhrase(PHRASE1);
+        return;
+      }
+
+      // ── Phase 5: scramble to phrase 2 (P_PHRASE1_HOLD → P_SCRAMBLE_END) ──
+      if (progress <= P_SCRAMBLE_END) {
+        const p = (progress - P_PHRASE1_HOLD) / (P_SCRAMBLE_END - P_PHRASE1_HOLD);
+        renderPhrase(PHRASE1, PHRASE2, p);
+        return;
+      }
+
+      // ── Phase 5: phrase 2 stable ──
+      setPhrase(PHRASE2);
+    }
+
+    video.addEventListener('loadedmetadata', () => { videoReady = true; });
+
+    // Seek to frame 0 without playing
+    video.addEventListener('canplay', () => {
+      if (video.currentTime === 0) video.currentTime = 0.001;
+    }, { once: true });
+
+    // ── Scroll hint ─────────────────────────────────
+    const scrollHint = document.getElementById('scroll-hint');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 10) scrollHint.classList.add('hidden');
+    }, { passive: true, once: true });
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Run once on load to set initial state
+    onScroll();
+  })();
+</script>
+</body>
+</html>
