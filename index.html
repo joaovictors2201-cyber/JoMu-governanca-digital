@@ -741,15 +741,115 @@
   }
   .reveal.visible { opacity: 1; transform: none; }
 
-  /* ─── RESPONSIVE ────────────────────────────────── */
+  /* ─── RESPONSIVE — tablet (≤900px) ─────────────── */
   @media (max-width: 900px) {
-    #hero { grid-template-columns: 1fr; padding: 6rem 5% 3rem; gap: 3rem; }
+    section { padding: 5rem 5%; }
+
+    #hero {
+      grid-template-columns: 1fr;
+      padding: 6rem 5% 3.5rem;
+      gap: 2.5rem;
+    }
     .hero-right { display: none; }
-    .pain-grid, .timeline, .data-big-grid,
+
+    .pain-grid  { grid-template-columns: 1fr 1fr; }
+    .timeline   { grid-template-columns: 1fr; }
+
+    .data-big-grid { grid-template-columns: 1fr; }
+    .data-cell.featured {
+      grid-column: span 1;
+      grid-template-columns: 1fr;
+    }
+
+    .transform-layout, .patients-layout { gap: 2.5rem; }
     .transform-layout, .patients-layout,
     .site-grid, .checklist-layout { grid-template-columns: 1fr; }
-    .data-cell.featured, .site-card.wide { grid-column: span 1; grid-template-columns: 1fr; }
-    .transform-layout, .patients-layout { gap: 2.5rem; }
+
+    .site-card.wide { grid-column: span 1; grid-template-columns: 1fr; }
+    .checklist-result { position: static; }
+  }
+
+  /* ─── RESPONSIVE — mobile (≤600px) ──────────────── */
+  @media (max-width: 600px) {
+    /* Video intro: altura usa svh para corrigir bug do Safari iOS
+       (100vh no iOS inclui a barra do browser e causa overflow) */
+    #video-scroll-wrapper { height: 420vh; }
+    #video-sticky {
+      height: 100vh;
+      height: 100svh;
+    }
+
+    #phrase-text {
+      font-size: clamp(1.35rem, 7vw, 2rem);
+      letter-spacing: 0.03em;
+      gap: 0 0.2em;
+    }
+
+    /* Nav */
+    nav { padding: .9rem 4%; }
+    .nav-logo { font-size: 1.05rem; }
+    .nav-cta { padding: .45rem 1rem; font-size: .8rem; }
+
+    /* Hero */
+    #hero {
+      padding: 5rem 4% 3rem;
+      min-height: 100vh;
+      min-height: 100svh;
+    }
+    .hero-title { font-size: clamp(2rem, 9vw, 2.8rem); }
+    .hero-body { font-size: 1rem; margin-bottom: 2rem; }
+    .btn-primary { width: 100%; text-align: center; padding: .9rem 1.5rem; }
+    .hero-actions { flex-direction: column; align-items: flex-start; gap: .85rem; }
+
+    /* Sections */
+    section { padding: 3.5rem 4%; }
+    .section-title { font-size: clamp(1.6rem, 7.5vw, 2.2rem); }
+    .section-subtitle { font-size: .95rem; }
+
+    /* Pain */
+    .pain-grid { grid-template-columns: 1fr; }
+    .pain-card { padding: 1.75rem 1.5rem; }
+
+    /* Data */
+    .data-cell { padding: 2rem 1.75rem; }
+    .data-cell.featured { padding: 2.25rem 1.75rem; }
+    .data-cell.featured .data-number { font-size: clamp(2.8rem, 12vw, 4rem); }
+    .data-number { font-size: clamp(2.5rem, 11vw, 3.5rem); }
+    .featured-text { font-size: .9rem; }
+
+    /* Timeline */
+    .timeline-step { padding: 2rem 1.5rem; }
+    .step-num { font-size: 3rem; }
+
+    /* Patients */
+    .big-stat-num { font-size: 4.5rem; }
+    .big-stat-block { padding: 2.25rem 1.5rem; }
+    .patient-stat-row { gap: 1rem; padding: 1.2rem; }
+    .psn { font-size: 1.6rem; min-width: 56px; }
+
+    /* Site */
+    .site-card { padding: 1.75rem 1.5rem; }
+    .wide-badge .num { font-size: 2rem; }
+
+    /* Checklist */
+    .checklist-result { padding: 2.25rem 1.75rem; }
+    .result-score { font-size: 4rem; }
+    .check-item { padding: .9rem 1rem; font-size: .88rem; }
+
+    /* CTA */
+    #cta { padding: 6rem 4%; }
+    .cta-title { font-size: clamp(1.9rem, 8vw, 2.6rem); }
+    .cta-body { font-size: 1rem; }
+    .cta-form { flex-direction: column; }
+    .cta-input, .btn-cta { width: 100%; min-width: unset; }
+
+    /* Footer */
+    footer { font-size: .78rem; padding: 2rem 4%; }
+  }
+
+  /* ─── iOS Safari — viewport height fix ──────────── */
+  @supports not (height: 100svh) {
+    #video-sticky { height: -webkit-fill-available; }
   }
 </style>
 </head>
