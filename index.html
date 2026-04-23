@@ -24,13 +24,15 @@
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden; /* movido para html — overflow em body quebra sticky no iOS Safari */
+  }
 
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--warm-white);
     color: var(--text-dark);
-    overflow-x: hidden;
   }
 
   /* ─── VIDEO INTRO ────────────────────────────────── */
@@ -858,7 +860,7 @@
 <!-- VIDEO INTRO SCROLL WRAPPER -->
 <div id="video-scroll-wrapper">
   <div id="video-sticky">
-    <video id="intro-video" src="video topo landing page.mp4" muted playsinline preload="auto"></video>
+    <video id="intro-video" src="video topo landing page.mp4" muted playsinline webkit-playsinline preload="auto"></video>
     <div id="scroll-hint">
       <span class="sh-label">Scroll</span>
       <div class="sh-arrow"></div>
@@ -883,7 +885,7 @@
 
 <!-- HERO -->
 <section id="hero">
-  <video class="hero-bg-video" src="7089942-uhd_3840_2160_25fps.mp4" autoplay muted loop playsinline></video>
+  <video class="hero-bg-video" src="7089942-uhd_3840_2160_25fps.mp4" autoplay muted loop playsinline webkit-playsinline></video>
   <div class="hero-video-overlay"></div>
   <div class="hero-left">
     <div class="hero-label">Para gestores de clínicas médicas</div>
@@ -1444,7 +1446,7 @@
 
       // ── Phase 1: video scrub (0 → P_VIDEO_END) ──
       if (progress <= P_VIDEO_END) {
-        if (videoReady) {
+        if (videoReady && video.readyState >= 2) {
           video.currentTime = (progress / P_VIDEO_END) * video.duration;
         }
         overlay.style.opacity = '0';
@@ -1454,7 +1456,7 @@
       }
 
       // Ensure video is at last frame
-      if (videoReady) video.currentTime = video.duration;
+      if (videoReady && video.readyState >= 2) video.currentTime = video.duration;
 
       // ── Phase 2: fade to black (P_VIDEO_END → P_FADE_END) ──
       if (progress <= P_FADE_END) {
@@ -1496,12 +1498,24 @@
       setPhrase(PHRASE2);
     }
 
-    video.addEventListener('loadedmetadata', () => { videoReady = true; });
+    // Força carregamento explícito (iOS ignora preload="auto")
+    video.load();
 
-    // Seek to frame 0 without playing
+    // canplay é mais confiável que loadedmetadata para seek no mobile
     video.addEventListener('canplay', () => {
+      videoReady = true;
       if (video.currentTime === 0) video.currentTime = 0.001;
-    }, { once: true });
+    });
+
+    // iOS Safari exige interação do usuário antes de permitir seek
+    // No primeiro toque, faz play+pause para desbloquear o buffer
+    const unlockiOS = () => {
+      video.play().then(() => {
+        video.pause();
+        videoReady = true;
+      }).catch(() => {});
+    };
+    document.addEventListener('touchstart', unlockiOS, { once: true, passive: true });
 
     // ── Scroll hint ─────────────────────────────────
     const scrollHint = document.getElementById('scroll-hint');
