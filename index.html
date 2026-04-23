@@ -679,6 +679,28 @@
 
   /* ─── DIAGNOSE CHECKLIST ────────────────────────── */
   #checklist { background: var(--warm-white); }
+  .result-fields { display: flex; flex-direction: column; gap: .6rem; margin-bottom: .85rem; }
+  .result-input {
+    width: 100%;
+    padding: .75rem 1rem;
+    border-radius: 2px;
+    border: 1.5px solid rgba(255,255,255,.22);
+    background: rgba(255,255,255,.1);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .92rem;
+    outline: none;
+    transition: border-color .2s, background .2s;
+  }
+  .result-input::placeholder { color: rgba(255,255,255,.45); }
+  .result-input:focus { border-color: rgba(255,255,255,.65); background: rgba(255,255,255,.15); }
+  .result-input.error { border-color: #ffd166; animation: shake .3s ease; }
+  .result-fields-error { font-size: .8rem; color: #ffd166; min-height: 1.1em; margin-bottom: .6rem; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25%      { transform: translateX(-5px); }
+    75%      { transform: translateX(5px); }
+  }
   .checklist-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1345,32 +1367,16 @@
       <p class="result-message" id="resultMsg">
         Marque os itens ao lado para ver o diagnóstico da sua clínica.
       </p>
-      <a href="maturidade_clinica.html" class="btn-result" id="resultBtn">Quero o diagnóstico completo →</a>
+      <div class="result-fields">
+        <input type="text" id="leadName" class="result-input" placeholder="Nome da clínica *">
+        <input type="tel"  id="leadPhone" class="result-input" placeholder="Seu WhatsApp *">
+      </div>
+      <p class="result-fields-error" id="fieldsError"></p>
+      <button class="btn-result" onclick="submitChecklist()">Receber diagnóstico pelo WhatsApp →</button>
     </div>
   </div>
 </section>
 
-<!-- CTA FINAL -->
-<section id="cta">
-  <div class="section-label cta-label reveal">Comece agora</div>
-  <h2 class="cta-title reveal" style="transition-delay:.1s">
-    Sua clínica tem potencial.<br>
-    <em>A JoMu faz o resto.</em>
-  </h2>
-  <p class="cta-body reveal" style="transition-delay:.2s">
-    Gestão integrada de agenda, pacientes, financeiro e presença digital — 
-    tudo em um só lugar, pensado para clínicas médicas de verdade.
-  </p>
-  <div class="cta-form reveal" style="transition-delay:.3s">
-    <input type="text" class="cta-input" placeholder="Nome da clínica">
-    <input type="tel" class="cta-input" placeholder="WhatsApp">
-    <button class="btn-cta" onclick="submitCTA()">Quero começar</button>
-  </div>
-  <p class="cta-disclaimer reveal" style="transition-delay:.4s">
-    Ou prefere começar pelo diagnóstico?
-    <a href="maturidade_clinica.html" style="color:var(--rust); font-weight:500; text-decoration:none; margin-left:.3rem">Avaliar maturidade da clínica →</a>
-  </p>
-</section>
 
 <!-- FOOTER -->
 <footer>
@@ -1401,6 +1407,7 @@
 
   // ── Checklist ───────────────────────────────────
   const msgs = [
+    "Marque os itens ao lado para ver o diagnóstico da sua clínica.",
     "Sua clínica está em boa forma. Mas sempre há espaço para otimizar.",
     "Há oportunidades claras. Vale a pena investigar o que está travando.",
     "Sua clínica está perdendo receita todo mês. Vamos conversar.",
@@ -1415,19 +1422,60 @@
 
   function updateScore() {
     const total = document.querySelectorAll('.check-item.checked').length;
-    const max = 8;
     document.getElementById('scoreNum').textContent = total;
-    document.getElementById('resultBar').style.width = (total / max * 100) + '%';
+    document.getElementById('resultBar').style.width = (total / 8 * 100) + '%';
     const idx = total === 0 ? 0 : total <= 2 ? 1 : total <= 4 ? 2 : total <= 6 ? 3 : 4;
     document.getElementById('resultMsg').textContent = msgs[idx];
   }
 
-  // ── CTA submit ──────────────────────────────────
-  function submitCTA() {
-    const btn = document.querySelector('.btn-cta');
-    btn.textContent = '✓ Recebemos! Em breve entraremos em contato.';
-    btn.style.background = 'var(--dark-red)';
-    btn.disabled = true;
+  // ── Checklist submit → WhatsApp ─────────────────
+  function submitChecklist() {
+    const name     = document.getElementById('leadName').value.trim();
+    const phone    = document.getElementById('leadPhone').value.trim();
+    const total    = document.querySelectorAll('.check-item.checked').length;
+    const errorEl  = document.getElementById('fieldsError');
+    const nameEl   = document.getElementById('leadName');
+    const phoneEl  = document.getElementById('leadPhone');
+
+    // Reset erros
+    nameEl.classList.remove('error');
+    phoneEl.classList.remove('error');
+    errorEl.textContent = '';
+
+    // Validação
+    if (total === 0) {
+      errorEl.textContent = 'Marque ao menos um item ao lado antes de continuar.';
+      return;
+    }
+    if (!name) {
+      errorEl.textContent = 'Informe o nome da clínica.';
+      nameEl.classList.add('error');
+      nameEl.focus();
+      return;
+    }
+    if (!phone) {
+      errorEl.textContent = 'Informe seu WhatsApp.';
+      phoneEl.classList.add('error');
+      phoneEl.focus();
+      return;
+    }
+
+    // Monta lista de problemas marcados
+    const items = [...document.querySelectorAll('.check-item.checked span')]
+      .map(el => '• ' + el.textContent.trim())
+      .join('\n');
+
+    const diagnosis = document.getElementById('resultMsg').textContent;
+
+    const msg =
+      `🏥 *Nova lead — Autodiagnóstico*\n\n` +
+      `🏷️ Clínica: ${name}\n` +
+      `📱 Contato: ${phone}\n` +
+      `📊 Pontuação: ${total}/8 pontos\n` +
+      `📋 Diagnóstico: ${diagnosis}\n\n` +
+      `✅ *Problemas identificados:*\n${items}`;
+
+    window.open('https://wa.me/5511988161228?text=' + encodeURIComponent(msg), '_blank');
   }
 
   // ── Scroll-driven video intro ────────────────────
