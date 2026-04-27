@@ -191,11 +191,10 @@
     transition: box-shadow .3s;
   }
   nav.scrolled { box-shadow: 0 2px 24px rgba(115,31,13,0.08); }
-  .nav-logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.25rem; font-weight: 700;
-    color: var(--rust);
-    letter-spacing: -0.02em;
+  .nav-logo img {
+    height: 36px;
+    width: auto;
+    display: block;
   }
   .nav-cta {
     background: var(--rust);
@@ -956,8 +955,10 @@
 
 <!-- NAV -->
 <nav id="nav">
-  <div class="nav-logo">Respo</div>
-  <a href="#cta" class="nav-cta">Falar com a JoMu</a>
+  <div class="nav-logo">
+    <img src="../Jomu/1x/logo-horizontal-branco.png" alt="JoMu">
+  </div>
+  <a href="https://wa.me/5511988161228?text=Ol%C3%A1%2C%20quero%20saber%20mais%20sobre%20a%20JoMu!" target="_blank" rel="noopener" class="nav-cta">Falar com a JoMu</a>
 </nav>
 
 <!-- HERO -->
@@ -976,7 +977,7 @@
       Não é falta de esforço — é falta da estrutura certa.
     </p>
     <div class="hero-actions">
-      <a href="#cta" class="btn-primary">Quero transformar minha clínica</a>
+      <a href="https://wa.me/5511988161228?text=Ol%C3%A1%2C%20quero%20transformar%20minha%20cl%C3%ADnica!" target="_blank" rel="noopener" class="btn-primary">Quero transformar minha clínica</a>
       <a href="#pain" class="btn-ghost">Ver os dados</a>
     </div>
   </div>
